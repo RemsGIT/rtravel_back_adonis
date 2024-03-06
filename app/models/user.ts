@@ -3,6 +3,7 @@ import { withAuthFinder } from '@adonisjs/auth'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
+import Roles from "../Enums/roles.js";
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -14,7 +15,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare id: number
 
   @column()
-  declare fullName: string | null
+  declare username: string | null
 
   @column()
   declare email: string
@@ -22,9 +23,16 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column()
   declare password: string
 
+  @column()
+  declare role: Roles
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+
+  isAdmin = () => {
+    return [Roles.ADMIN, Roles.SUPERADMIN].includes(this.role)
+  }
 }
