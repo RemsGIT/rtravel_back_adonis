@@ -2,8 +2,10 @@ import { DateTime } from 'luxon'
 import { withAuthFinder } from '@adonisjs/auth'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, column, hasMany } from "@adonisjs/lucid/orm";
 import Roles from "../Enums/roles.js";
+import Trip from "#models/trip";
+import type { HasMany } from "@adonisjs/lucid/types/relations";
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -31,6 +33,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+
+  @hasMany(() => Trip)
+  declare trips: HasMany<typeof Trip>
 
   isAdmin = () => {
     return [Roles.ADMIN, Roles.SUPERADMIN].includes(this.role)
