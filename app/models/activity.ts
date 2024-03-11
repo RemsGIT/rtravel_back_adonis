@@ -22,6 +22,9 @@ export default class Activity extends BaseModel {
   @column()
   declare icon?: string
 
+  @column()
+  declare tripId: number
+
   @belongsTo(() => Trip)
   declare trip: BelongsTo<typeof Trip>
 }

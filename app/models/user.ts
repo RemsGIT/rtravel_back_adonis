@@ -2,10 +2,10 @@ import { DateTime } from 'luxon'
 import { withAuthFinder } from '@adonisjs/auth'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, column, hasMany } from "@adonisjs/lucid/orm";
-import Roles from "../Enums/roles.js";
-import Trip from "#models/trip";
-import type { HasMany } from "@adonisjs/lucid/types/relations";
+import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
+import Roles from '../Enums/roles.js'
+import Trip from '#models/trip'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],

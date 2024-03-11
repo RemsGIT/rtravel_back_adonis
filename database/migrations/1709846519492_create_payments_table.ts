@@ -14,9 +14,16 @@ export default class extends BaseSchema {
       table.timestamps(true, true)
 
       table
-        .integer('created_by')
+        .integer('created_by_id')
         .unsigned()
         .references('users.id')
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE')
+
+      table
+        .integer('trip_id')
+        .unsigned()
+        .references('trips.id')
         .onUpdate('CASCADE')
         .onDelete('CASCADE')
 

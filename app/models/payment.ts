@@ -4,6 +4,7 @@ import PaymentCategory from '../Enums/paymentCategory.js'
 import User from '#models/user'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import Participant from '#models/participant'
+import Trip from "#models/trip";
 
 export default class Payment extends BaseModel {
   @column({ isPrimary: true })
@@ -13,7 +14,7 @@ export default class Payment extends BaseModel {
   declare amount: number
 
   @column()
-  declare category: PaymentCategory
+  declare category?: PaymentCategory
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -21,9 +22,23 @@ export default class Payment extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 
+  @column()
+  declare tripId: number
+
+  @belongsTo(() => Trip)
+  declare trip: BelongsTo<typeof Trip>
+
+  @column()
+  declare participantId: number
+
   @belongsTo(() => Participant)
   declare participant: BelongsTo<typeof Participant>
 
-  @belongsTo(() => User)
+  @column()
+  declare createdById: number
+
+  @belongsTo(() => User, {
+    foreignKey: 'createdById',
+  })
   declare createdBy: BelongsTo<typeof User>
 }

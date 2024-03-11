@@ -10,6 +10,7 @@ export default class extends BaseSchema {
       table.string('place').nullable()
       table.string('city')
       table.timestamp('start')
+      table.string('icon').nullable()
 
       table.timestamps(true, true)
 

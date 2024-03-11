@@ -1,11 +1,11 @@
 enum PaymentCategory {
-  transport,
-  accommodation,
-  food,
-  activities,
-  shopping,
-  services,
-  other,
+  transport = 'transport',
+  accommodation = 'accommodation',
+  food = 'food',
+  activities = 'activities',
+  shopping = 'shopping',
+  services = 'service',
+  other = 'other',
 }
 
 export default PaymentCategory

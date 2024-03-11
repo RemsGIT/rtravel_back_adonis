@@ -24,6 +24,9 @@ export default class Participant extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 
+  @column()
+  declare tripId: number
+
   @belongsTo(() => Trip)
   declare trip: BelongsTo<typeof Trip>
 
