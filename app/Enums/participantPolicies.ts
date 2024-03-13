@@ -1,6 +1,6 @@
 enum ParticipantPolicies {
-  READ,
-  WRITE,
+  READ = 'read',
+  WRITE = 'write',
 }
 
 export default ParticipantPolicies

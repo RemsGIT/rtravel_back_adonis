@@ -1,3 +1,51 @@
 // import type { HttpContext } from '@adonisjs/core/http'
 
-export default class ParticipantsController {}
+import { HttpContext } from '@adonisjs/core/http'
+import { createParticipantValidator, updateParticipantValidator } from '#validators/participant'
+import Participant from '#models/participant'
+
+export default class ParticipantsController {
+  async store({ request, response }: HttpContext) {
+    const payload = await request.validateUsing(createParticipantValidator)
+
+    const participant = await Participant.create({
+      name: payload.name,
+      email: payload.email,
+      tripId: Number(payload.tripId),
+      policy: payload.policy,
+    })
+
+    return response.created(participant)
+  }
+
+  async show({ params, response }: HttpContext) {
+    const participant = await Participant.findOrFail(params.id)
+
+    return response.ok(participant)
+  }
+
+  async update({ params, request, response }: HttpContext) {
+    const participant = await Participant.findOrFail(params.id)
+
+    const payload = await request.validateUsing(updateParticipantValidator)
+
+    const participantUpdated = await participant
+      .merge({
+        name: payload.name,
+        email: payload.email,
+        tripId: Number(payload.tripId),
+        policy: payload.policy,
+      })
+      .save()
+
+    return response.ok(participantUpdated)
+  }
+
+  async destroy({ params, response }: HttpContext) {
+    const participant = await Participant.findOrFail(params.id)
+
+    await participant.delete()
+
+    return response.ok({ message: `Participant ${participant.id} deleted` })
+  }
+}

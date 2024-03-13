@@ -9,6 +9,7 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+const ParticipantsController = () => import('#controllers/participants_controller')
 const TripsController = () => import('#controllers/trips_controller')
 const ActivitiesController = () => import('#controllers/activities_controller')
 const BudgetsController = () => import('#controllers/budgets_controller')
@@ -39,5 +40,6 @@ router
     router.resource('/activities', ActivitiesController).except(['index'])
     router.resource('/budgets', BudgetsController).except(['index'])
     router.resource('/payments', PaymentsController).except(['index'])
+    router.resource('/participants', ParticipantsController).except(['index'])
   })
   .middleware(middleware.auth())
