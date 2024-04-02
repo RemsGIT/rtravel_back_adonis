@@ -1,6 +1,7 @@
 import { HttpContext } from '@adonisjs/core/http'
 import { createTripValidator, updateTripValidator } from '#validators/trip'
 import Trip from '#models/trip'
+import { DateTime } from 'luxon'
 
 export default class TripsController {
   /**
@@ -63,5 +64,62 @@ export default class TripsController {
     await trip.delete()
 
     return response.ok({ message: `Trip ${trip.id}  deleted` })
+  }
+
+  async getCurrentOrMostRecentTrip({ auth, response }: HttpContext) {
+    const now = DateTime.now().startOf('day').toString()
+
+    const currentTrip = await Trip.query()
+      .where('userId', auth.user?.id as number)
+      .andWhere('start', '<=', now)
+      .andWhere('end', '>=', now)
+      .orderBy('start', 'asc')
+      .first()
+
+    if (currentTrip) {
+      return response.ok({ trip: currentTrip })
+    }
+
+    const upcomingTrip = await Trip.query()
+      .where('userId', auth.user?.id as number)
+      .andWhere('start', '>', now)
+      .orderBy('start', 'asc')
+      .first()
+
+    if (upcomingTrip) {
+      return response.ok({ trip: upcomingTrip })
+    }
+
+    return response.ok({ trip: null })
+  }
+
+  async getFutureTrips({ auth, response }: HttpContext) {
+    const now = DateTime.now().startOf('day').toString()
+
+    const futureTrips = await Trip.query()
+      .where('userId', auth.user?.id as number)
+      .andWhere('start', '>=', now)
+      .orderBy('start', 'asc')
+
+    return response.ok({ trips: futureTrips })
+  }
+
+  async getPastTrips({ auth, response }: HttpContext) {
+    const now = DateTime.now().startOf('day').toString()
+
+    const pastTrips = await Trip.query()
+      .where('userId', auth.user?.id as number)
+      .andWhere('end', '<', now)
+      .orderBy('start', 'asc')
+
+    return response.ok({ trips: pastTrips })
+  }
+
+  async getParticipants({ response, params }: HttpContext) {
+    const trip = await Trip.findOrFail(params.id)
+
+    await trip.load('participants')
+
+    return response.ok({ participants: trip.participants })
   }
 }

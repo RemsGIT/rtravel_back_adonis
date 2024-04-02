@@ -27,6 +27,7 @@ router
   .group(() => {
     router.post('/login', [AuthController, 'login'])
     router.post('/register', [AuthController, 'register'])
+    router.post('/logout', [AuthController, 'logout'])
   })
   .prefix('auth')
 
@@ -36,7 +37,18 @@ router
     router.get('/auth/me', [AuthController, 'me'])
     router.get('/auth/logout', [AuthController, 'logout'])
 
+    /** TRIPS **/
+    router
+      .group(() => {
+        router.get('/current', [TripsController, 'getCurrentOrMostRecentTrip'])
+        router.get('/future', [TripsController, 'getFutureTrips'])
+        router.get('/past', [TripsController, 'getPastTrips'])
+        router.get('/:id/participants', [TripsController, 'getParticipants'])
+      })
+      .prefix('trips')
     router.resource('/trips', TripsController)
+
+
     router.resource('/activities', ActivitiesController).except(['index'])
     router.resource('/budgets', BudgetsController).except(['index'])
     router.resource('/payments', PaymentsController).except(['index'])

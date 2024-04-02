@@ -6,6 +6,7 @@ import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import Roles from '../Enums/roles.js'
 import Trip from '#models/trip'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
+import { DbAccessTokensProvider } from "@adonisjs/auth/access_tokens";
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -40,4 +41,11 @@ export default class User extends compose(BaseModel, AuthFinder) {
   isAdmin = () => {
     return [Roles.ADMIN, Roles.SUPERADMIN].includes(this.role)
   }
+
+  static accessTokens = DbAccessTokensProvider.forModel(User, {
+    prefix: 'oat_',
+    table: 'auth_access_tokens',
+    type: 'auth_token',
+    tokenSecretLength: 40,
+  })
 }

@@ -5,16 +5,20 @@ import { loginValidator, registerValidator } from '#validators/auth'
 import User from '#models/user'
 
 export default class AuthController {
-  async login({ auth, response, request }: HttpContext) {
+  async login({ response, request }: HttpContext) {
     const { email, password } = await request.validateUsing(loginValidator)
 
     try {
       const user = await User.verifyCredentials(email, password)
+      const token = await User.accessTokens.create(user)
 
-      await auth.use('web').login(user)
-
-      return response.ok({ message: 'User connected', user })
+      return response.ok({
+        message: 'User connected',
+        user: user.serialize(),
+        token: token,
+      })
     } catch (e) {
+      console.log(e)
       return response.abort({ error: 'invalid_credentials' })
     }
   }
@@ -39,12 +43,19 @@ export default class AuthController {
   }
 
   async logout({ auth, response }: HttpContext) {
-    await auth.use('web').logout()
+    const user = auth.getUserOrFail()
+
+    await User.accessTokens.delete(user, user.currentAccessToken.identifier)
 
     return response.ok({ message: 'Déconnexion réussie' })
   }
 
-  me({ auth }: HttpContext) {
-    return auth.user?.serializeAttributes({ omit: ['password'] })
+  me({ auth, response }: HttpContext) {
+    try {
+      const user = auth.getUserOrFail().serializeAttributes({ omit: ['password'] })
+      return response.ok(user)
+    } catch (error) {
+      return response.unauthorized({ error: 'User not found' })
+    }
   }
 }
