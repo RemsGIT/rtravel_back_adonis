@@ -8,7 +8,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.string('name').nullable()
-      table.string('email')
+      table.string('email').nullable()
       table.enum('policy', Object.values(ParticipantPolicies)).defaultTo(ParticipantPolicies.READ)
 
       table.timestamps(true, true)

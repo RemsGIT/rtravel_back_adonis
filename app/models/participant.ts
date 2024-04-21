@@ -13,7 +13,7 @@ export default class Participant extends BaseModel {
   declare name?: string
 
   @column()
-  declare email: string
+  declare email?: string
 
   @column()
   declare policy?: ParticipantPolicies
