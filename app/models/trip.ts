@@ -17,6 +17,9 @@ export default class Trip extends BaseModel {
   @column()
   declare city: string
 
+  @column()
+  declare countryCode: string
+
   @column.dateTime()
   declare start: DateTime
 

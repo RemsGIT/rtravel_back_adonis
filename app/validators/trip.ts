@@ -5,7 +5,8 @@ export const createTripValidator = vine.compile(
     name: vine.string(),
     city: vine.string(),
     start: vine.any(),
-    end: vine.any()
+    end: vine.any(),
+    countryCode: vine.string(),
   })
 )
 
@@ -14,6 +15,7 @@ export const updateTripValidator = vine.compile(
     name: vine.string().optional(),
     city: vine.string().optional(),
     start: vine.any().optional(),
-    end: vine.any().optional()
+    end: vine.any().optional(),
+    countryCode: vine.string(),
   })
 )

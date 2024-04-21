@@ -23,6 +23,7 @@ export default class TripsController {
     const trip = await Trip.create({
       name: payload.name,
       city: payload.city,
+      countryCode: payload.countryCode,
       start: payload.start,
       end: payload.end,
       userId: auth.user?.id,
