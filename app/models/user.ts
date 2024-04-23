@@ -6,7 +6,7 @@ import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import Roles from '../Enums/roles.js'
 import Trip from '#models/trip'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
-import { DbAccessTokensProvider } from "@adonisjs/auth/access_tokens";
+import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -28,6 +28,15 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @column()
   declare role: Roles
+
+  @column()
+  declare isVerified: boolean
+
+  @column()
+  declare otpCode: number | null
+
+  @column.dateTime()
+  declare otpExpireAt: DateTime | null
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

@@ -37,6 +37,8 @@ router
   .group(() => {
     router.get('/auth/me', [AuthController, 'me'])
     router.get('/auth/logout', [AuthController, 'logout'])
+    router.post('/auth/generate-otp', [AuthController, 'generateOTPCode'])
+    router.post('/auth/check-otp', [AuthController, 'checkOTPCode'])
 
     /** TRIPS **/
     router

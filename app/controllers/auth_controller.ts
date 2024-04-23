@@ -1,8 +1,10 @@
 // import type { HttpContext } from '@adonisjs/core/http'
 
 import { HttpContext } from '@adonisjs/core/http'
-import { loginValidator, registerValidator } from '#validators/auth'
+import { checkOTPValidator, loginValidator, registerValidator } from '#validators/auth'
 import User from '#models/user'
+import { DateTime } from 'luxon'
+import mail from '@adonisjs/mail/services/main'
 
 export default class AuthController {
   async login({ response, request }: HttpContext) {
@@ -18,7 +20,6 @@ export default class AuthController {
         token: token,
       })
     } catch (e) {
-      console.log(e)
       return response.abort({ error: 'invalid_credentials' })
     }
   }
@@ -29,7 +30,7 @@ export default class AuthController {
 
       const user = await User.create(payload)
 
-      return response.created(user)
+      return response.created(user.serializeAttributes({ omit: ['password'] }))
     } catch (e) {
       switch (e.code) {
         case 'E_VALIDATION_ERROR':
@@ -48,6 +49,55 @@ export default class AuthController {
     await User.accessTokens.delete(user, user.currentAccessToken.identifier)
 
     return response.ok({ message: 'Déconnexion réussie' })
+  }
+
+  async generateOTPCode({ auth, response }: HttpContext) {
+    const user = auth.getUserOrFail()
+
+    if (user.isVerified) return response.abort({ error: 'ACCOUNT_ALREADY_VERIFIED' })
+
+    // 4 digits
+    const otp = Math.floor(1000 + Math.random() * 9000)
+
+    await user
+      .merge({
+        otpCode: otp,
+        otpExpireAt: DateTime.now().plus({ minutes: 5 }),
+      })
+      .save()
+
+    // Send otp code by mail
+    await mail.send((message) => {
+      message
+        .to(user.email)
+        .subject('Activation du compte')
+        .html(`<p>Voici ton code : ${otp}. Il expirera dans 5 minutes</p>`)
+    })
+  }
+
+  async checkOTPCode({ auth, request, response }: HttpContext) {
+    const payload = await request.validateUsing(checkOTPValidator)
+
+    const user = auth.getUserOrFail()
+    if (user.isVerified) return response.abort({ error: 'ACCOUNT_ALREADY_VERIFIED' })
+
+    if (!user.otpCode || !user.otpExpireAt) return response.abort({ error: 'NO_OTP' })
+
+    // Check if code is valid
+    if (Number(user.otpCode) !== payload.otp) return response.abort({ error: 'OTP_NOT_VALID' })
+
+    // Check if date is expired
+    if (user.otpExpireAt && user.otpExpireAt <= DateTime.now()) {
+      return response.abort({ error: 'OTP_EXPIRED' })
+    }
+
+    await user
+      .merge({
+        isVerified: true,
+      })
+      .save()
+
+    return response.ok({ message: 'ACCOUNT_VERIFIED' })
   }
 
   me({ auth, response }: HttpContext) {

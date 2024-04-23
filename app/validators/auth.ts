@@ -20,3 +20,9 @@ export const registerValidator = vine.compile(
     password: vine.string().minLength(8).maxLength(32),
   })
 )
+
+export const checkOTPValidator = vine.compile(
+  vine.object({
+    otp: vine.number().range([1000, 9999]),
+  })
+)
