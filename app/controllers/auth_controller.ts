@@ -18,6 +18,7 @@ export default class AuthController {
         message: 'User connected',
         user: user.serialize(),
         token: token,
+        verified: user.isVerified
       })
     } catch (e) {
       return response.abort({ error: 'invalid_credentials' })
@@ -102,9 +103,16 @@ export default class AuthController {
 
   me({ auth, response }: HttpContext) {
     try {
-      const user = auth.getUserOrFail().serializeAttributes({ omit: ['password'] })
+      const user = auth.getUserOrFail().serializeAttributes({ omit: ['password','otpCode','otpExpireAt'] })
+
+      if(!user.isVerified) {
+        return response.abort({error: 'ACCOUNT_NOT_VERIFIED'})
+      }
+
       return response.ok(user)
     } catch (error) {
+      if(error.body.error === 'ACCOUNT_NOT_VERIFIED') return response.abort({error: 'ACCOUNT_NOT_VERIFIED'})
+
       return response.unauthorized({ error: 'User not found' })
     }
   }
