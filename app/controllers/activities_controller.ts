@@ -4,10 +4,10 @@ import Trip from '#models/trip'
 import Activity from '#models/activity'
 
 export default class ActivitiesController {
-  async store({ request, response }: HttpContext) {
+  async store({ params, request, response }: HttpContext) {
     const payload = await request.validateUsing(createActivityValidator)
 
-    const trip = await Trip.findOrFail(payload.tripId)
+    const trip = await Trip.findOrFail(params.tripId)
 
     try {
       const activity = await trip.related('activities').create({

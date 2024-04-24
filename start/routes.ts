@@ -9,7 +9,7 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
-import UsersController from "#controllers/users_controller";
+const UsersController = () => import('#controllers/users_controller')
 const ParticipantsController = () => import('#controllers/participants_controller')
 const TripsController = () => import('#controllers/trips_controller')
 const ActivitiesController = () => import('#controllers/activities_controller')
@@ -41,20 +41,39 @@ router
     router.post('/auth/check-otp', [AuthController, 'checkOTPCode'])
 
     /** TRIPS **/
+    router.resource('trips', TripsController).except(['show', 'update']) // create trip, list trips of user...
     router
       .group(() => {
         router.get('/current', [TripsController, 'getCurrentOrMostRecentTrip'])
         router.get('/future', [TripsController, 'getFutureTrips'])
         router.get('/past', [TripsController, 'getPastTrips'])
-        router.get('/:id/participants', [TripsController, 'getParticipants'])
       })
       .prefix('trips')
-    router.resource('/trips', TripsController)
 
-    router.resource('/activities', ActivitiesController).except(['index'])
-    router.resource('/budgets', BudgetsController).except(['index'])
-    router.resource('/payments', PaymentsController).except(['index'])
-    router.resource('/participants', ParticipantsController).except(['index'])
+
+    router.get('trips/:tripId', [TripsController, 'show']).middleware(middleware.canViewTrip())
+    router.patch('trips/:tripId', [TripsController, 'update']).middleware(middleware.canModifyTrip())
+    router
+      .group(() => {
+        // NEED READ PERMISSION
+        router
+          .group(() => {
+            router.get('/participants', [TripsController, 'getParticipants'])
+          })
+          .middleware(middleware.canViewTrip())
+
+        // NEED MODIFY PERMISSION
+        router
+          .group(() => {
+            router.resource('activities', ActivitiesController).except(['index'])
+            router.resource('budgets', BudgetsController).except(['index'])
+            router.resource('payments', PaymentsController).except(['index'])
+            router.resource('participants', ParticipantsController).except(['index'])
+          })
+          .middleware(middleware.canModifyTrip())
+      })
+      .prefix('trips/:tripId')
+    // add middleware to check if user has access to trip -> in participant + write permission or owner => but need to have /trips/id/activities etc...
 
     /** USERS **/
     router

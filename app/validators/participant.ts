@@ -6,9 +6,6 @@ export const createParticipantValidator = vine.compile(
     name: vine.string().optional(),
     email: vine.string().email().optional(),
     policy: vine.enum(Object.values(ParticipantPolicies)).optional(),
-    tripId: vine.string().exists(async (db, field) => {
-      return await db.from('trips').where('id', field).first()
-    }),
   })
 )
 
@@ -17,11 +14,5 @@ export const updateParticipantValidator = vine.compile(
     name: vine.string().optional(),
     email: vine.string().email().optional(),
     policy: vine.enum(Object.values(ParticipantPolicies)).optional(),
-    tripId: vine
-      .string()
-      .exists(async (db, field) => {
-        return await db.from('trips').where('id', field).first()
-      })
-      .optional(),
   })
 )

@@ -6,10 +6,10 @@ import Trip from '#models/trip'
 import Budget from '#models/budget'
 
 export default class BudgetsController {
-  async store({ request, response }: HttpContext) {
+  async store({ params, request, response }: HttpContext) {
     const payload = await request.validateUsing(createBudgetValidator)
 
-    const trip = await Trip.findOrFail(payload.tripId)
+    const trip = await Trip.findOrFail(params.tripId)
 
     try {
       const budget = await trip.related('budget').create({

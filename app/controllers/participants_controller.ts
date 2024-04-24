@@ -5,13 +5,13 @@ import { createParticipantValidator, updateParticipantValidator } from '#validat
 import Participant from '#models/participant'
 
 export default class ParticipantsController {
-  async store({ request, response }: HttpContext) {
+  async store({ params, request, response }: HttpContext) {
     const payload = await request.validateUsing(createParticipantValidator)
 
     const participant = await Participant.create({
       name: payload.name,
       email: payload.email,
-      tripId: Number(payload.tripId),
+      tripId: Number(params.tripId),
       policy: payload.policy,
     })
 
@@ -33,7 +33,7 @@ export default class ParticipantsController {
       .merge({
         name: payload.name,
         email: payload.email,
-        tripId: Number(payload.tripId),
+        tripId: Number(params.tripId),
         policy: payload.policy,
       })
       .save()

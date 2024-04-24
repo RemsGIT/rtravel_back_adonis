@@ -18,7 +18,7 @@ export default class AuthController {
         message: 'User connected',
         user: user.serialize(),
         token: token,
-        verified: user.isVerified
+        verified: user.isVerified,
       })
     } catch (e) {
       return response.abort({ error: 'invalid_credentials' })
@@ -72,7 +72,7 @@ export default class AuthController {
       message
         .to(user.email)
         .subject('Activation du compte')
-        .html(`<p>Voici ton code : ${otp}. Il expirera dans 5 minutes</p>`)
+        .html(`<p>Voici ton code : ${otp}. Il est valide 5 minutes</p>`)
     })
   }
 
@@ -103,15 +103,18 @@ export default class AuthController {
 
   me({ auth, response }: HttpContext) {
     try {
-      const user = auth.getUserOrFail().serializeAttributes({ omit: ['password','otpCode','otpExpireAt'] })
+      const user = auth
+        .getUserOrFail()
+        .serializeAttributes({ omit: ['password', 'otpCode', 'otpExpireAt'] })
 
-      if(!user.isVerified) {
-        return response.abort({error: 'ACCOUNT_NOT_VERIFIED'})
+      if (!user.isVerified) {
+        return response.abort({ error: 'ACCOUNT_NOT_VERIFIED' })
       }
 
       return response.ok(user)
     } catch (error) {
-      if(error.body.error === 'ACCOUNT_NOT_VERIFIED') return response.abort({error: 'ACCOUNT_NOT_VERIFIED'})
+      if (error.body.error === 'ACCOUNT_NOT_VERIFIED')
+        return response.abort({ error: 'ACCOUNT_NOT_VERIFIED' })
 
       return response.unauthorized({ error: 'User not found' })
     }

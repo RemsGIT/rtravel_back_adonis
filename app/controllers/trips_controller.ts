@@ -34,7 +34,7 @@ export default class TripsController {
 
   async show({ params, response }: HttpContext) {
     try {
-      const trip = await Trip.findOrFail(params.id)
+      const trip = await Trip.findOrFail(params.tripId)
 
       // Check if user can see the trip -> owns or email in participant or public link defined
 
@@ -51,7 +51,7 @@ export default class TripsController {
   }
 
   async update({ params, request, response }: HttpContext) {
-    const trip = await Trip.findOrFail(params.id)
+    const trip = await Trip.findOrFail(params.tripId)
     const payload = await request.validateUsing(updateTripValidator)
 
     const tripUpdated = await trip.merge(payload).save()
@@ -59,8 +59,11 @@ export default class TripsController {
     return response.ok(tripUpdated)
   }
 
-  async destroy({ params, response }: HttpContext) {
+  async destroy({ params, response, auth }: HttpContext) {
     const trip = await Trip.findOrFail(params.id)
+
+    // Check if owner
+    if (trip.userId !== auth.user?.id) return response.abort({ error: 'Not authorized' }, 403)
 
     await trip.delete()
 
@@ -117,7 +120,7 @@ export default class TripsController {
   }
 
   async getParticipants({ response, params }: HttpContext) {
-    const trip = await Trip.findOrFail(params.id)
+    const trip = await Trip.findOrFail(params.tripId)
 
     await trip.load('participants')
 

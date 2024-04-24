@@ -7,7 +7,6 @@ export const createActivityValidator = vine.compile(
     city: vine.string(),
     start: vine.any(),
     icon: vine.string().optional(),
-    tripId: vine.number().positive(),
   })
 )
 

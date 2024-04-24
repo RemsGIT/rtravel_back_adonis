@@ -7,7 +7,7 @@ import Payment from '#models/payment'
 import PaymentCategory from '../Enums/paymentCategory.js'
 
 export default class PaymentsController {
-  async store({ request, response, auth }: HttpContext) {
+  async store({ params, request, response, auth }: HttpContext) {
     const payload = await request.validateUsing(createPaymentValidator)
 
     let pId
@@ -20,7 +20,7 @@ export default class PaymentsController {
       const payment = await Payment.create({
         amount: payload.amount,
         category: payload.category ? (payload.category as PaymentCategory) : undefined,
-        tripId: Number(payload.tripId),
+        tripId: Number(params.tripId),
         participantId: pId,
         createdById: auth.user?.id,
       })
@@ -47,7 +47,7 @@ export default class PaymentsController {
         amount: payload.amount,
         category: payload.category,
         participantId: payload.participantId,
-        tripId: Number(payload.tripId),
+        tripId: Number(params.tripId),
       })
       .save()
 
