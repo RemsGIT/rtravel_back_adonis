@@ -13,7 +13,9 @@ export default class TripsController {
 
       const trips = auth.user.trips
 
-      return response.ok(trips)
+      const sharedTrips = await auth.user.getSharedTrips()
+
+      return response.ok({ trips: trips, shared: sharedTrips })
     }
   }
 
@@ -35,8 +37,6 @@ export default class TripsController {
   async show({ params, response }: HttpContext) {
     try {
       const trip = await Trip.findOrFail(params.tripId)
-
-      // Check if user can see the trip -> owns or email in participant or public link defined
 
       await trip.load('activities')
       await trip.load('participants')
@@ -70,28 +70,42 @@ export default class TripsController {
     return response.ok({ message: `Trip ${trip.id}  deleted` })
   }
 
+  /**
+   * Fetch current trip or most recent in user's trips or shared trips
+   * @param auth
+   * @param response
+   */
   async getCurrentOrMostRecentTrip({ auth, response }: HttpContext) {
     const now = DateTime.now().startOf('day').toString()
+    const userId = auth.user?.id as number
 
     const currentTrip = await Trip.query()
-      .where('userId', auth.user?.id as number)
+      .where((query) => {
+        query.where('userId', userId).orWhereHas('participants', (builder) => {
+          builder.where('email', auth?.user?.email as string)
+        })
+      })
       .andWhere('start', '<=', now)
       .andWhere('end', '>=', now)
       .orderBy('start', 'asc')
       .first()
 
     if (currentTrip) {
-      return response.ok({ trip: currentTrip })
+      return response.ok({ trip: currentTrip, isShared: currentTrip.userId !== userId })
     }
 
     const upcomingTrip = await Trip.query()
-      .where('userId', auth.user?.id as number)
+      .where((query) => {
+        query.where('userId', userId).orWhereHas('participants', (builder) => {
+          builder.where('email', auth?.user?.email as string)
+        })
+      })
       .andWhere('start', '>', now)
       .orderBy('start', 'asc')
       .first()
 
     if (upcomingTrip) {
-      return response.ok({ trip: upcomingTrip })
+      return response.ok({ trip: upcomingTrip, isShared: upcomingTrip.userId !== userId })
     }
 
     return response.ok({ trip: null })
@@ -101,22 +115,44 @@ export default class TripsController {
     const now = DateTime.now().startOf('day').toString()
 
     const futureTrips = await Trip.query()
-      .where('userId', auth.user?.id as number)
+      .where((query) => {
+        query.where('userId', auth?.user?.id as number).orWhereHas('participants', (builder) => {
+          builder.where('email', auth?.user?.email as string)
+        })
+      })
       .andWhere('start', '>=', now)
       .orderBy('start', 'asc')
 
-    return response.ok({ trips: futureTrips })
+    const tripsWithSharedInfo = futureTrips.map((trip) => {
+      return {
+        ...trip.toJSON(),
+        isShared: trip.userId !== (auth?.user?.id as number),
+      }
+    })
+
+    return response.ok({ trips: tripsWithSharedInfo })
   }
 
   async getPastTrips({ auth, response }: HttpContext) {
     const now = DateTime.now().startOf('day').toString()
 
     const pastTrips = await Trip.query()
-      .where('userId', auth.user?.id as number)
+      .where((query) => {
+        query.where('userId', auth?.user?.id as number).orWhereHas('participants', (builder) => {
+          builder.where('email', auth?.user?.email as string)
+        })
+      })
       .andWhere('end', '<', now)
       .orderBy('start', 'asc')
 
-    return response.ok({ trips: pastTrips })
+    const tripsWithSharedInfo = pastTrips.map((trip) => {
+      return {
+        ...trip.toJSON(),
+        isShared: trip.userId !== (auth?.user?.id as number),
+      }
+    })
+
+    return response.ok({ trips: tripsWithSharedInfo })
   }
 
   async getParticipants({ response, params }: HttpContext) {

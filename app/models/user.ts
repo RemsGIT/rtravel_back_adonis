@@ -57,4 +57,12 @@ export default class User extends compose(BaseModel, AuthFinder) {
     type: 'auth_token',
     tokenSecretLength: 40,
   })
+
+  async getSharedTrips() {
+    const trips = await Trip.query().whereHas('participants', (builder) => {
+      builder.where('email', this.email)
+    })
+
+    return trips
+  }
 }
