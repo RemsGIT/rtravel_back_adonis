@@ -1,6 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
-import Trip from "#models/trip";
+import Trip from '#models/trip'
 
 export default class CanViewTripMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
@@ -16,9 +16,7 @@ export default class CanViewTripMiddleware {
 
     // Check if user is the owner or in the participants
     const isOwner = trip.userId === user.id
-    const isParticipant = !!trip.participants.find(
-      (p) => p.email === user.email
-    )
+    const isParticipant = !!trip.participants.find((p) => p.email === user.email)
 
     if (!isOwner && !isParticipant) return ctx.response.abort({ error: 'NOT_AUTHORIZED' }, 400)
 
