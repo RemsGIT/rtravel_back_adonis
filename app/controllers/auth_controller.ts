@@ -44,14 +44,6 @@ export default class AuthController {
     }
   }
 
-  async logout({ auth, response }: HttpContext) {
-    const user = auth.getUserOrFail()
-
-    await User.accessTokens.delete(user, user.currentAccessToken.identifier)
-
-    return response.ok({ message: 'Déconnexion réussie' })
-  }
-
   async generateOTPCode({ auth, response }: HttpContext) {
     const user = auth.getUserOrFail()
 
@@ -118,5 +110,13 @@ export default class AuthController {
 
       return response.unauthorized({ error: 'User not found' })
     }
+  }
+
+  async logout({ auth, response }: HttpContext) {
+    const user = await auth.authenticate()
+
+    await User.accessTokens.delete(user, user.currentAccessToken.identifier)
+
+    return response.ok({ message: 'Déconnexion réussie' })
   }
 }

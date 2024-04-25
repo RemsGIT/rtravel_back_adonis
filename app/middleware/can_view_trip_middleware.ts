@@ -20,8 +20,6 @@ export default class CanViewTripMiddleware {
       (p) => p.email === user.email
     )
 
-    console.log(isOwner, isParticipant)
-
     if (!isOwner && !isParticipant) return ctx.response.abort({ error: 'NOT_AUTHORIZED' }, 400)
 
     /**

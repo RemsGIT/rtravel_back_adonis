@@ -41,6 +41,7 @@ router
     router.post('/auth/check-otp', [AuthController, 'checkOTPCode'])
 
     /** TRIPS **/
+    router.get('/user/hastrips', [UsersController, 'hasTrips'])
     router.resource('trips', TripsController).except(['show', 'update']) // create trip, list trips of user...
     router
       .group(() => {

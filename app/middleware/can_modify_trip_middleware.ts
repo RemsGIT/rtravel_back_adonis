@@ -21,8 +21,6 @@ export default class CanModifyTripMiddleware {
       (p) => p.email === user.email && p.policy === ParticipantPolicies.WRITE
     )
 
-    console.log(isOwner, isParticipantWithWritePermission)
-
     if (!isOwner && !isParticipantWithWritePermission)
       return ctx.response.abort({ error: 'NOT_AUTHORIZED' }, 400)
 
