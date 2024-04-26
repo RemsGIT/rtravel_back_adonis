@@ -91,7 +91,11 @@ export default class TripsController {
       .first()
 
     if (currentTrip) {
-      return response.ok({ trip: currentTrip, isShared: currentTrip.userId !== userId })
+      const tripCurrentWithSharedInfo = {
+        ...currentTrip.toJSON(),
+        isShared: currentTrip.userId !== userId,
+      }
+      return response.ok({ trip: tripCurrentWithSharedInfo })
     }
 
     const upcomingTrip = await Trip.query()
@@ -105,7 +109,11 @@ export default class TripsController {
       .first()
 
     if (upcomingTrip) {
-      return response.ok({ trip: upcomingTrip, isShared: upcomingTrip.userId !== userId })
+      const tripUpcomingWithSharedInfo = {
+        ...upcomingTrip.toJSON(),
+        isShared: upcomingTrip.userId !== userId,
+      }
+      return response.ok({ trip: tripUpcomingWithSharedInfo })
     }
 
     return response.ok({ trip: null })
@@ -159,7 +167,8 @@ export default class TripsController {
     const trip = await Trip.findOrFail(params.tripId)
 
     await trip.load('participants')
+    await trip.load('user')
 
-    return response.ok({ participants: trip.participants })
+    return response.ok({ participants: trip.participants, owner: trip.user.serializeAttributes({pick: ['username','email']})})
   }
 }
