@@ -2,8 +2,13 @@ import { HttpContext } from '@adonisjs/core/http'
 import { createTripValidator, updateTripValidator } from '#validators/trip'
 import Trip from '#models/trip'
 import { DateTime } from 'luxon'
+import { inject } from '@adonisjs/core'
+import FileUploaderService from '#services/file_uploader_service'
 
+@inject()
 export default class TripsController {
+  constructor(protected FileUploader: FileUploaderService) {}
+
   /**
    * List of the resource
    */
@@ -55,6 +60,26 @@ export default class TripsController {
     const payload = await request.validateUsing(updateTripValidator)
 
     const tripUpdated = await trip.merge(payload).save()
+
+    // Save images if exists
+    const thumbnail = request.file('thumbnail')
+    const cover = request.file('cover')
+
+    if (thumbnail) {
+      await this.FileUploader.removeFile(`public/${trip.thumbnail}`)
+
+      const thumbnailUrl = await this.FileUploader.uploadFile(
+        thumbnail,
+        `trips/${trip.id}/thumbnail`
+      )
+      if (thumbnailUrl !== '') await trip.merge({ thumbnail: thumbnailUrl }).save()
+    }
+    if (cover) {
+      await this.FileUploader.removeFile(`public/${trip.cover}`)
+
+      const coverUrl = await this.FileUploader.uploadFile(cover, `trips/${trip.id}/cover`)
+      if (coverUrl !== '') await trip.merge({ cover: coverUrl }).save()
+    }
 
     return response.ok(tripUpdated)
   }
@@ -169,6 +194,9 @@ export default class TripsController {
     await trip.load('participants')
     await trip.load('user')
 
-    return response.ok({ participants: trip.participants, owner: trip.user.serializeAttributes({pick: ['username','email']})})
+    return response.ok({
+      participants: trip.participants,
+      owner: trip.user.serializeAttributes({ pick: ['username', 'email'] }),
+    })
   }
 }

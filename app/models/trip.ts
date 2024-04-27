@@ -27,6 +27,12 @@ export default class Trip extends BaseModel {
   declare end: DateTime
 
   @column()
+  declare thumbnail: string
+
+  @column()
+  declare cover: string
+
+  @column()
   declare publicLink?: string
 
   @column()

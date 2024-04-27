@@ -17,5 +17,7 @@ export const updateTripValidator = vine.compile(
     start: vine.any().optional(),
     end: vine.any().optional(),
     countryCode: vine.string().optional(),
+    //thumbnail: vine.string().optional(),
+    //cover: vine.string().optional(),
   })
 )

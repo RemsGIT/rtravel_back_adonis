@@ -56,7 +56,9 @@
     "@adonisjs/lucid": "^20.1.0",
     "@adonisjs/mail": "^9.2.1",
     "@adonisjs/session": "^7.1.1",
+    "@adonisjs/static": "^1.1.1",
     "@vinejs/vine": "^1.7.1",
+    "aws-sdk": "^2.1608.0",
     "luxon": "^3.4.4",
     "mysql2": "^3.9.2",
     "reflect-metadata": "^0.2.1"
