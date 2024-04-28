@@ -8,7 +8,7 @@ export default class extends BaseSchema {
       table.increments('id')
       table.string('name')
       table.string('city')
-      table.timestamp('start')
+      table.timestamp('start').nullable()
       table.timestamp('end').nullable()
 
       table.string('public_link').nullable()
