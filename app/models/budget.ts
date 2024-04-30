@@ -8,7 +8,7 @@ export default class Budget extends BaseModel {
   declare id: number
 
   @column()
-  declare budget: number
+  declare amount: number
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

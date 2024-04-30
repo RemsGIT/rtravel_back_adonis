@@ -13,7 +13,7 @@ export default class BudgetsController {
 
     try {
       const budget = await trip.related('budget').create({
-        budget: payload.budget,
+        amount: payload.amount,
       })
 
       return response.created(budget)

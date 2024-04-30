@@ -60,6 +60,8 @@ router
         router
           .group(() => {
             router.get('/participants', [TripsController, 'getParticipants'])
+            router.get('/budget', [TripsController, 'getBudget'])
+            router.get('/payments', [TripsController, 'getPayments'])
           })
           .middleware(middleware.canViewTrip())
 
@@ -67,7 +69,7 @@ router
         router
           .group(() => {
             router.resource('activities', ActivitiesController).except(['index'])
-            router.resource('budgets', BudgetsController).except(['index'])
+            router.resource('budget', BudgetsController).except(['index'])
             router.resource('payments', PaymentsController).except(['index'])
             router.resource('participants', ParticipantsController).except(['index'])
           })

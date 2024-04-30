@@ -37,8 +37,16 @@ export default class Payment extends BaseModel {
   @column()
   declare createdById: number
 
+  @column()
+  declare updatedById: number
+
   @belongsTo(() => User, {
     foreignKey: 'createdById',
   })
   declare createdBy: BelongsTo<typeof User>
+
+  @belongsTo(() => User, {
+    foreignKey: 'updatedById',
+  })
+  declare updatedBy: BelongsTo<typeof User>
 }

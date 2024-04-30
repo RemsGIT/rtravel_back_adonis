@@ -199,4 +199,20 @@ export default class TripsController {
       owner: trip.user.serializeAttributes({ pick: ['username', 'email'] }),
     })
   }
+
+  async getBudget({ response, params }: HttpContext) {
+    const trip = await Trip.findOrFail(params.tripId)
+
+    await trip.load('budget')
+
+    return response.ok(trip.budget)
+  }
+
+  async getPayments({ response, params }: HttpContext) {
+    const trip = await Trip.findOrFail(params.tripId)
+
+    await trip.load('payments')
+
+    return response.ok(trip.payments)
+  }
 }
