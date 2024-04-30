@@ -14,6 +14,9 @@ export default class Payment extends BaseModel {
   declare amount: number
 
   @column()
+  declare description?: string
+
+  @column()
   declare category?: PaymentCategory
 
   @column.dateTime({ autoCreate: true })
@@ -29,10 +32,18 @@ export default class Payment extends BaseModel {
   declare trip: BelongsTo<typeof Trip>
 
   @column()
-  declare participantId: number
+  declare participantId: number | null
 
   @belongsTo(() => Participant)
   declare participant: BelongsTo<typeof Participant>
+
+  @column()
+  declare userId: number | null
+
+  @belongsTo(() => User, {
+    foreignKey: 'userId',
+  })
+  declare user: BelongsTo<typeof User>
 
   @column()
   declare createdById: number

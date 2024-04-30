@@ -4,6 +4,7 @@ import Trip from '#models/trip'
 import { DateTime } from 'luxon'
 import { inject } from '@adonisjs/core'
 import FileUploaderService from '#services/file_uploader_service'
+import Payment from '#models/payment'
 
 @inject()
 export default class TripsController {
@@ -196,7 +197,7 @@ export default class TripsController {
 
     return response.ok({
       participants: trip.participants,
-      owner: trip.user.serializeAttributes({ pick: ['username', 'email'] }),
+      owner: trip.user.serializeAttributes({ pick: ['id', 'username', 'email'] }),
     })
   }
 
@@ -209,10 +210,16 @@ export default class TripsController {
   }
 
   async getPayments({ response, params }: HttpContext) {
-    const trip = await Trip.findOrFail(params.tripId)
+    const payments = await Payment.query()
+      .preload('participant', (p) => {
+        p.select('name')
+      })
+      .preload('user', (u) => {
+        u.select('username')
+      })
+      .where('tripId', params.tripId)
+      .orderBy('createdAt', 'desc')
 
-    await trip.load('payments')
-
-    return response.ok(trip.payments)
+    return response.ok(payments)
   }
 }
