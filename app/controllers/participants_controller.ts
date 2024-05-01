@@ -8,6 +8,17 @@ export default class ParticipantsController {
   async store({ params, request, response }: HttpContext) {
     const payload = await request.validateUsing(createParticipantValidator)
 
+    // Check if participant isn't already in the trip
+    if (payload.email) {
+      const isParticipantInTrip = await Participant.query()
+        .where('email', payload.email)
+        .andWhere('tripId', Number(params.tripId))
+
+      if (isParticipantInTrip) {
+        return response.abort({ error: 'ALREADY_EXISTS' })
+      }
+    }
+
     const participant = await Participant.create({
       name: payload.name,
       email: payload.email,
