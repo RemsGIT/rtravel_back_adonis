@@ -44,6 +44,9 @@ export default class TripsController {
     try {
       const trip = await Trip.findOrFail(params.tripId)
 
+      await trip.load('user', (u) => {
+        u.select('id', 'username')
+      })
       await trip.load('activities')
       await trip.load('participants')
       await trip.load('budget')
