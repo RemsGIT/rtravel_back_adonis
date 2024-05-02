@@ -79,7 +79,9 @@ export default class TripsController {
     const cover = request.file('cover')
 
     if (thumbnail) {
-      await this.awsService.removeFile(trip.thumbnail.replace(`${env.get('AWS_S3_URL')}/`, ''))
+      if(trip.thumbnail) {
+        await this.awsService.removeFile(trip.thumbnail.replace(`${env.get('AWS_S3_URL')}/`, ''))
+      }
 
       await thumbnail.move(app.makePath('tmp/uploads'))
 
@@ -98,7 +100,9 @@ export default class TripsController {
       }
     }
     if (cover) {
-      await this.awsService.removeFile(trip.cover.replace(`${env.get('AWS_S3_URL')}/`, ''))
+      if(trip.cover) {
+        await this.awsService.removeFile(trip.cover.replace(`${env.get('AWS_S3_URL')}/`, ''))
+      }
 
       await cover.move(app.makePath('tmp/uploads'))
 
