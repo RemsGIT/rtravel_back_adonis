@@ -15,8 +15,10 @@ export default class ParticipantsController {
         .andWhere('tripId', Number(params.tripId))
         .first()
 
+
+
       if (isParticipantInTrip) {
-        return response.abort({ error: 'ALREADY_EXISTS' })
+        return response.abort({ error: 'ALREADY_EXISTS', p: isParticipantInTrip })
       }
     }
 
