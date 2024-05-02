@@ -5,10 +5,19 @@ import { DateTime } from 'luxon'
 import { inject } from '@adonisjs/core'
 import FileUploaderService from '#services/file_uploader_service'
 import Payment from '#models/payment'
+import AwsService from '#services/aws_service'
+import { cuid } from '@adonisjs/core/helpers'
+import app from '@adonisjs/core/services/app'
+import fs from 'node:fs/promises'
+import { promises as fsPromises } from 'node:fs'
+import env from '#start/env'
 
 @inject()
 export default class TripsController {
-  constructor(protected FileUploader: FileUploaderService) {}
+  constructor(
+    protected FileUploader: FileUploaderService,
+    protected awsService: AwsService
+  ) {}
 
   /**
    * List of the resource
@@ -70,19 +79,42 @@ export default class TripsController {
     const cover = request.file('cover')
 
     if (thumbnail) {
-      await this.FileUploader.removeFile(`public/${trip.thumbnail}`)
+      await this.awsService.removeFile(trip.thumbnail.replace(`${env.get('AWS_S3_URL')}/`, ''))
 
-      const thumbnailUrl = await this.FileUploader.uploadFile(
-        thumbnail,
-        `trips/${trip.id}/thumbnail`
+      await thumbnail.move(app.makePath('tmp/uploads'))
+
+      //@ts-ignore
+      const thumbnailBuffer = await fs.readFile(thumbnail.filePath)
+      const thumbnailUrl = await this.awsService.uploadFile(
+        thumbnailBuffer,
+        `trips/${trip.id}/thumbnail-${cuid()}.${thumbnail.extname}`
       )
+
       if (thumbnailUrl !== '') await trip.merge({ thumbnail: thumbnailUrl }).save()
+
+      // Remove file on disk
+      if (thumbnail.filePath) {
+        await fsPromises.unlink(thumbnail.filePath)
+      }
     }
     if (cover) {
-      await this.FileUploader.removeFile(`public/${trip.cover}`)
+      await this.awsService.removeFile(trip.cover.replace(`${env.get('AWS_S3_URL')}/`, ''))
 
-      const coverUrl = await this.FileUploader.uploadFile(cover, `trips/${trip.id}/cover`)
+      await cover.move(app.makePath('tmp/uploads'))
+
+      //@ts-ignore
+      const coverBuffer = await fs.readFile(cover.filePath)
+      const coverUrl = await this.awsService.uploadFile(
+        coverBuffer,
+        `trips/${trip.id}/cover-${cuid()}.${cover.extname}`
+      )
+
       if (coverUrl !== '') await trip.merge({ cover: coverUrl }).save()
+
+      // Remove file on disk
+      if (cover.filePath) {
+        await fsPromises.unlink(cover.filePath)
+      }
     }
 
     return response.ok(tripUpdated)

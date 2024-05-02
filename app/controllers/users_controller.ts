@@ -9,7 +9,6 @@ export default class UsersController {
 
     if(auth.user) {
       await auth.user.load('trips')
-      console.log(auth.user)
     }
 
     return response.ok({ result: (auth?.user?.trips?.length ?? 0) > 0 })
