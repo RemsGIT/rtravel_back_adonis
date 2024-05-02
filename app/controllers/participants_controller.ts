@@ -13,6 +13,7 @@ export default class ParticipantsController {
       const isParticipantInTrip = await Participant.query()
         .where('email', payload.email)
         .andWhere('tripId', Number(params.tripId))
+        .first()
 
       if (isParticipantInTrip) {
         return response.abort({ error: 'ALREADY_EXISTS' })
