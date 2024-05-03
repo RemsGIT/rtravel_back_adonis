@@ -2,16 +2,21 @@
 
 import { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
+import Trip from '#models/trip'
 
 export default class UsersController {
   async hasTrips({ auth, response }: HttpContext) {
+    let userTrips = []
 
-
-    if(auth.user) {
-      await auth.user.load('trips')
+    if (auth.user) {
+      userTrips = await Trip.query().where((query) => {
+        query.where('userId', auth?.user?.id as number).orWhereHas('participants', (builder) => {
+          builder.where('email', auth?.user?.email as string)
+        })
+      })
     }
 
-    return response.ok({ result: (auth?.user?.trips?.length ?? 0) > 0 })
+    return response.ok({ result: (userTrips.length ?? 0) > 0 })
   }
 
   async searchByExactEmail({ params, response }: HttpContext) {
