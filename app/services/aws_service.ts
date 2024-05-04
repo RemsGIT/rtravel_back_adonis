@@ -1,10 +1,13 @@
 import AWS from 'aws-sdk'
 import env from '#start/env'
+import { inject } from '@adonisjs/core'
+import FileCompressorService from '#services/file_compressor_service'
 
+@inject()
 export default class AwsService {
   private s3: AWS.S3
 
-  constructor() {
+  constructor(private fileCompressorService: FileCompressorService) {
     this.s3 = new AWS.S3({
       region: env.get('AWS_REGION'),
       credentials: {
@@ -16,6 +19,8 @@ export default class AwsService {
 
   async uploadFile(file: Buffer, file_name: string): Promise<string> {
     if (!file_name) return ''
+
+    file = await this.fileCompressorService.compressFile(file)
 
     const params = {
       Bucket: env.get('AWS_BUCKET_NAME'),

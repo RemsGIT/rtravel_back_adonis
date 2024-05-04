@@ -61,7 +61,8 @@
     "aws-sdk": "^2.1608.0",
     "luxon": "^3.4.4",
     "mysql2": "^3.9.2",
-    "reflect-metadata": "^0.2.1"
+    "reflect-metadata": "^0.2.1",
+    "sharp": "^0.33.3"
   },
   "eslintConfig": {
     "extends": "@adonisjs/eslint-config/app"
