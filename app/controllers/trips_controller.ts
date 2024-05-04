@@ -128,7 +128,15 @@ export default class TripsController {
     const trip = await Trip.findOrFail(params.id)
 
     // Check if owner
-    if (trip.userId !== auth.user?.id) return response.abort({ error: 'Not authorized' }, 403)
+    if (trip.userId !== auth.user?.id) return response.abort({ error: 'NOT_AUTHORIZED' }, 400)
+
+    // Delete all related files
+    if (trip.thumbnail) {
+      await this.awsService.removeFile(trip.thumbnail.replace(`${env.get('AWS_S3_URL')}/`, ''))
+    }
+    if (trip.cover) {
+      await this.awsService.removeFile(trip.cover.replace(`${env.get('AWS_S3_URL')}/`, ''))
+    }
 
     await trip.delete()
 
