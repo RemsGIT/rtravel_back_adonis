@@ -79,6 +79,7 @@ router
     // add middleware to check if user has access to trip -> in participant + write permission or owner => but need to have /trips/id/activities etc...
 
     /** USERS **/
+    router.patch('/user', [UsersController, 'update'])
     router
       .group(() => {
         router.get('/search/:email', [UsersController, 'searchByExactEmail'])
