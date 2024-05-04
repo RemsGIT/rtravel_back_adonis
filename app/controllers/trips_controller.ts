@@ -145,6 +145,9 @@ export default class TripsController {
     const userId = auth.user?.id as number
 
     const currentTrip = await Trip.query()
+      .preload('payments', (p) => {
+        p.select('amount')
+      })
       .where((query) => {
         query.where('userId', userId).orWhereHas('participants', (builder) => {
           builder.where('email', auth?.user?.email as string)
