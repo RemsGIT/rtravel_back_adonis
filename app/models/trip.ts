@@ -38,6 +38,12 @@ export default class Trip extends BaseModel {
   @column()
   declare userId: number
 
+  @column()
+  declare latitude?: number | null
+
+  @column()
+  declare longitude?: number | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

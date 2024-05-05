@@ -44,6 +44,8 @@ export default class TripsController {
       start: payload.start,
       end: payload.end,
       userId: auth.user?.id,
+      latitude: payload.latitude,
+      longitude: payload.longitude,
     })
 
     return response.created(trip)
@@ -79,7 +81,7 @@ export default class TripsController {
     const cover = request.file('cover')
 
     if (thumbnail) {
-      if(trip.thumbnail) {
+      if (trip.thumbnail) {
         await this.awsService.removeFile(trip.thumbnail.replace(`${env.get('AWS_S3_URL')}/`, ''))
       }
 
@@ -100,7 +102,7 @@ export default class TripsController {
       }
     }
     if (cover) {
-      if(trip.cover) {
+      if (trip.cover) {
         await this.awsService.removeFile(trip.cover.replace(`${env.get('AWS_S3_URL')}/`, ''))
       }
 
