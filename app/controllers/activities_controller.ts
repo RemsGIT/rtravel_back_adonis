@@ -16,6 +16,8 @@ export default class ActivitiesController {
         city: payload.city,
         start: payload.start,
         icon: payload.icon,
+        latitude: payload.latitude,
+        longitude: payload.longitude,
       })
 
       return response.created(activity)

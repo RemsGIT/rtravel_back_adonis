@@ -23,6 +23,12 @@ export default class Activity extends BaseModel {
   declare icon?: string
 
   @column()
+  declare latitude?: number | null
+
+  @column()
+  declare longitude?: number | null
+
+  @column()
   declare tripId: number
 
   @belongsTo(() => Trip)

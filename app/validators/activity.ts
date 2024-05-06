@@ -7,6 +7,8 @@ export const createActivityValidator = vine.compile(
     city: vine.string(),
     start: vine.any(),
     icon: vine.string().optional(),
+    latitude: vine.number().optional().nullable(),
+    longitude: vine.number().optional().nullable(),
   })
 )
 
@@ -17,5 +19,7 @@ export const updateActivityValidator = vine.compile(
     city: vine.string().optional(),
     start: vine.any().optional(),
     icon: vine.string().optional(),
+    latitude: vine.number().optional().nullable(),
+    longitude: vine.number().optional().nullable(),
   })
 )
