@@ -5,16 +5,13 @@ export default class FileCompressorService {
     const { width } = await sharp(inputBuffer).metadata()
     let newBuffer: Buffer
 
-    if (width && width > 800) {
+    if (width && width > 1300) {
       newBuffer = await sharp(inputBuffer)
-        .resize(800, null, { fit: 'inside' })
+        .resize(1300, null, { fit: 'inside' })
         .jpeg({ quality: 80 })
         .toBuffer()
     } else {
-      newBuffer = await sharp(inputBuffer)
-        .resize(1000, null, { fit: 'inside' }) // 300 is less than 600
-        .jpeg({ quality: 80 })
-        .toBuffer()
+      newBuffer = await sharp(inputBuffer).jpeg({ quality: 80 }).toBuffer()
     }
 
     return newBuffer
