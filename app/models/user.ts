@@ -7,6 +7,7 @@ import Roles from '../Enums/roles.js'
 import Trip from '#models/trip'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
+import CountryVisited from "#models/country_visited";
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -47,9 +48,8 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @hasMany(() => Trip)
   declare trips: HasMany<typeof Trip>
 
-  isAdmin = () => {
-    return [Roles.ADMIN, Roles.SUPERADMIN].includes(this.role)
-  }
+  @hasMany(() => CountryVisited)
+  declare countriesvisited: HasMany<typeof CountryVisited>
 
   static accessTokens = DbAccessTokensProvider.forModel(User, {
     prefix: 'oat_',
@@ -57,6 +57,10 @@ export default class User extends compose(BaseModel, AuthFinder) {
     type: 'auth_token',
     tokenSecretLength: 40,
   })
+
+  isAdmin = () => {
+    return [Roles.ADMIN, Roles.SUPERADMIN].includes(this.role)
+  }
 
   async getSharedTrips() {
     const trips = await Trip.query().whereHas('participants', (builder) => {

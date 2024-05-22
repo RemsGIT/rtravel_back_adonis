@@ -9,6 +9,7 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+import CountriesVisitedController from "#controllers/countries_visited_controller";
 const UsersController = () => import('#controllers/users_controller')
 const ParticipantsController = () => import('#controllers/participants_controller')
 const TripsController = () => import('#controllers/trips_controller')
@@ -40,7 +41,7 @@ router
     router.post('/auth/generate-otp', [AuthController, 'generateOTPCode'])
     router.post('/auth/check-otp', [AuthController, 'checkOTPCode'])
 
-    /** TRIPS **/
+    /** region TRIPS **/
     router.get('/user/hastrips', [UsersController, 'hasTrips'])
     router.resource('trips', TripsController).except(['show', 'update']) // create trip, list trips of user...
     router
@@ -76,14 +77,16 @@ router
           .middleware(middleware.canModifyTrip())
       })
       .prefix('trips/:tripId')
-    // add middleware to check if user has access to trip -> in participant + write permission or owner => but need to have /trips/id/activities etc...
+    /** endregion TRIPS **/
 
-    /** USERS **/
+    /** region USERS **/
     router.patch('/user', [UsersController, 'update'])
     router
       .group(() => {
         router.get('/search/:email', [UsersController, 'searchByExactEmail'])
       })
       .prefix('users')
+    router.resource('countries', CountriesVisitedController).only(['index', 'store', 'destroy'])
+    /** endregion **/
   })
   .middleware(middleware.auth())
