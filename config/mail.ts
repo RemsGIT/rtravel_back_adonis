@@ -10,8 +10,8 @@ const mailConfig = defineConfig({
    * Email
    */
   from: {
-    address: 'test-rtravel@rcastro.fr',
-    name: 'Test rtravel',
+    address: 'contact@rtravel.fr',
+    name: 'Rtravel',
   },
 
   /**

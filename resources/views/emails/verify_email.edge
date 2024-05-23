@@ -1,0 +1,32 @@
+@mjml({
+  keepComments: false,
+  fonts: {
+    Lato: 'https://fonts.googleapis.com/css?family=Lato:400,500,700'
+  }
+})
+  <mjml>
+    <mj-head>
+      <mj-attributes>
+        <mj-text align="center" color="#555" />
+      </mj-attributes>
+      <mj-style inline="inline"> .footer-link { color: #888888 } </mj-style>
+    </mj-head>
+    <mj-body background-color="#eee">
+      @include('emails/partials/header.edge')
+      <mj-wrapper padding-top="0px" padding-bottom="0px">
+        <mj-section background-color="#ffffff" padding-left="15px" padding-right="15px">
+          <mj-column width="100%">
+            <mj-text color="#212b35" font-weight="bold" font-size="20px"> Salut {{username}}, </mj-text>
+            <mj-text color="#637381" font-size="14px"> Voici le code dont tu as besoin pour activer ton compte : </mj-text>
+
+              <mj-text align="center" color="#12B981" font-size="50px" padding="20px">
+                <p style="border: 1px solid black;padding:20px;border-radius:10px">{{code}}</p>
+            </mj-text>
+            <mj-text color="#637381" font-size="11px" font-style="italic"> Attention, ce code est valide 5 minutes. Après ce délai, tu devras demander un nouveau code</mj-text>
+          </mj-column>
+        </mj-section>
+      </mj-wrapper>
+      @include('emails/partials/footer.edge')
+    </mj-body>
+  </mjml>
+@end

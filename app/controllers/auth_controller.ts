@@ -62,9 +62,13 @@ export default class AuthController {
     // Send otp code by mail
     await mail.send((message) => {
       message
+        .from('Rtravel <noreply@rtravel.fr>')
         .to(user.email)
         .subject('Activation du compte')
-        .html(`<p>Voici ton code : ${otp}. Il est valide 5 minutes</p>`)
+        .htmlView('emails/verify_email', {
+          username: user.username,
+          code: otp,
+        })
     })
   }
 
