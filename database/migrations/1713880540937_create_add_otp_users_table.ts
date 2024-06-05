@@ -13,7 +13,9 @@ export default class extends BaseSchema {
 
   async down() {
     this.schema.alterTable(this.tableName, (table) => {
-      table.dropColumn('country_code')
+      table.dropColumn('is_verified')
+      table.dropColumn('otp_code')
+      table.dropColumn('otp_expire_at')
     })
   }
 }
