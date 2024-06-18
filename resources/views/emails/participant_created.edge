@@ -1,0 +1,55 @@
+@mjml({
+  keepComments: false,
+  fonts: {
+    Lato: 'https://fonts.googleapis.com/css?family=Lato:400,500,700'
+  }
+})
+  <mjml>
+    <mj-head>
+      <mj-attributes>
+        <mj-text align="center" color="#555" />
+      </mj-attributes>
+      <mj-style inline="inline"> .footer-link { color: #888888 } </mj-style>
+    </mj-head>
+    <mj-body background-color="#eee">
+      @include('emails/partials/header.edge')
+      <mj-wrapper padding-top="0px" padding-bottom="0px">
+        <mj-section background-color="#ffffff" padding-left="15px" padding-right="15px">
+          <mj-column width="100%">
+            <mj-text color="#212b35" font-weight="bold" font-size="20px"> Salut {{username}}, </mj-text>
+            <mj-text font-size="14px"> Tu as été invité sur le voyage {{trip_name}} par {{author}}</mj-text>
+            <mj-text font-size="14px" line-height="20px">Tu peux dès maintenant te connecter ou te créer un compte avec cette adresse email pour accéder à ton voyage ! </mj-text>
+            <mj-text color="#212b35" font-weight="bold" font-size="20px"> {{trip_name}}</mj-text>
+
+            <mj-image src="{{trip_thumbnail}}" alt="" padding="0" href="{{trip_link}}" width="300px"  align="center" padding-top="15px" padding-bottom="10px"/>
+
+
+            <mj-text color="#445566" font-weight="bold" font-size="12px" padding-top="10px"><a href="{{trip_link}}"></a>{{trip_link}}</mj-text>
+          </mj-column>
+        </mj-section>
+
+
+      </mj-wrapper>
+
+      <mj-wrapper full-width="full-width">
+              <mj-section>
+                <mj-column width="100%" padding="0">
+                  <mj-text color="#445566" font-size="11px" align="center" line-height="16px"> Tu as reçu ce mail car un utilisateur de Rtravel a renseigné ton adresse email dans son voyage. Si tu n'es pas concerné, merci de pas ne pas tenir compte de cet e-mail </mj-text>
+                  <mj-text color="#445566" font-size="11px" align="center" line-height="16px"> &copy; Rtravel, Tous droits réservés. </mj-text>
+                </mj-column>
+              </mj-section>
+              <mj-section padding-top="0">
+                <mj-group>
+                  <mj-column width="100%" padding-right="0">
+                    <mj-text color="#445566" font-size="11px" align="center" line-height="16px" font-weight="bold">
+                      <a class="footer-link" href="https://rtravel.fr">Rtravel</a>&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;<a class="footer-link" href="https://rtravel.fr">Politique de confidentialité</a>
+                    </mj-text>
+                  </mj-column>
+                </mj-group>
+              </mj-section>
+            </mj-wrapper>
+          </mj-wrapper>
+
+    </mj-body>
+  </mjml>
+@end

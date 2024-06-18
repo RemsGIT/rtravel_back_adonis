@@ -4,6 +4,7 @@ import { HttpContext } from '@adonisjs/core/http'
 import { createParticipantValidator, updateParticipantValidator } from '#validators/participant'
 import Participant from '#models/participant'
 import User from '#models/user'
+import emitter from '@adonisjs/core/services/emitter'
 
 export default class ParticipantsController {
   async store({ params, request, response }: HttpContext) {
@@ -33,6 +34,9 @@ export default class ParticipantsController {
       tripId: Number(params.tripId),
       policy: payload.policy,
     })
+
+    // Event to send email
+    emitter.emit('participant:created', participant)
 
     return response.created(participant)
   }
