@@ -9,7 +9,10 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
-import CountriesVisitedController from "#controllers/countries_visited_controller";
+import { HttpContext } from '@adonisjs/core/http'
+import { contactFromCommercialSite } from '#validators/contact'
+import mail from '@adonisjs/mail/services/main'
+const CountriesVisitedController = () => import('#controllers/countries_visited_controller')
 const UsersController = () => import('#controllers/users_controller')
 const ParticipantsController = () => import('#controllers/participants_controller')
 const TripsController = () => import('#controllers/trips_controller')
@@ -52,9 +55,10 @@ router
       })
       .prefix('trips')
 
-
     router.get('trips/:tripId', [TripsController, 'show']).middleware(middleware.canViewTrip())
-    router.patch('trips/:tripId', [TripsController, 'update']).middleware(middleware.canModifyTrip())
+    router
+      .patch('trips/:tripId', [TripsController, 'update'])
+      .middleware(middleware.canModifyTrip())
     router
       .group(() => {
         // NEED READ PERMISSION
@@ -90,3 +94,22 @@ router
     /** endregion **/
   })
   .middleware(middleware.auth())
+
+// Routes publiques
+router.post('/contact', async ({ request, response }: HttpContext) => {
+  const payload = await request.validateUsing(contactFromCommercialSite)
+
+  await mail.send((message) => {
+    message
+      .from('Rtravel Contact <noreply@rtravel.fr>')
+      .to('contact@rcastro.fr')
+      .subject('Nouveau message sur Rtravel')
+      .html(`
+        <h1>Nom : ${payload.name}</h1>
+        <h4>Email : ${payload.email}</h4>
+        <p>Contenu du message : <br/>${payload.body}</p>
+      `)
+  })
+
+  return response.ok({ message: 'sent' })
+})
