@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 import Trip from '#models/trip'
+import Roles from "../Enums/roles.js";
 
 export default class CanViewTripMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
@@ -18,7 +19,8 @@ export default class CanViewTripMiddleware {
     const isOwner = trip.userId === user.id
     const isParticipant = !!trip.participants.find((p) => p.email === user.email)
 
-    if (!isOwner && !isParticipant) return ctx.response.abort({ error: 'NOT_AUTHORIZED' }, 400)
+    if (!isOwner && !isParticipant && user.role !== Roles.SUPERADMIN)
+      return ctx.response.abort({ error: 'NOT_AUTHORIZED' }, 400)
 
     /**
      * Call next method in the pipeline and return its output
