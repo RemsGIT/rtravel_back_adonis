@@ -1,5 +1,3 @@
-// import type { HttpContext } from '@adonisjs/core/http'
-
 import { HttpContext } from '@adonisjs/core/http'
 import { checkOTPValidator, loginValidator, registerValidator } from '#validators/auth'
 import User from '#models/user'
@@ -41,6 +39,63 @@ export default class AuthController {
             message: `Une erreur s'est produite lors de l'inscription.`,
           })
       }
+    }
+  }
+
+  async googleCallback({ ally, response }: HttpContext) {
+    try {
+      const google = ally.use('google')
+
+      if (google.accessDenied()) {
+        return response.redirect(
+          `http://localhost:4200/oauth/google/callback/null?error=accessdenied`
+        )
+      }
+
+      if (google.stateMisMatch()) {
+        return response.redirect(`http://localhost:4200/oauth/google/callback/null?error=mismatch`)
+      }
+
+      if (google.hasError()) {
+        return response.redirect(
+          `http://localhost:4200/oauth/google/callback/null?error=${google.getError()}`
+        )
+      }
+
+      // Fetch user details
+      const googleUser = await google.user()
+
+      // Check if account already registered by form
+      const userInDatabase = await User.findBy('email', googleUser.email)
+      if (userInDatabase && userInDatabase.password) {
+        return response.redirect(
+          `http://localhost:4200/oauth/google/callback/null?error=already_registered`
+        )
+      }
+
+      // Check if the user already exists in the database
+      const user = await User.firstOrCreate(
+        {
+          email: googleUser.email!,
+        },
+        {
+          username: googleUser.name,
+          email: googleUser.email!,
+          isVerified: googleUser.emailVerificationState === 'verified',
+        }
+      )
+
+      // Generate a token for the user
+      const token = await User.accessTokens.create(user)
+
+      return response.redirect(
+        `http://localhost:4200/oauth/google/callback/${token.value?.release()}`
+      )
+    } catch (error) {
+      return response.internalServerError({
+        message: 'An error occurred during Google authentication',
+        error: error.message,
+      })
     }
   }
 
