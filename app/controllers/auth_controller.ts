@@ -48,17 +48,17 @@ export default class AuthController {
 
       if (google.accessDenied()) {
         return response.redirect(
-          `http://localhost:4200/oauth/google/callback/null?error=accessdenied`
+          `${process.env.FRONT_URL}/oauth/google/callback/null?error=accessdenied`
         )
       }
 
       if (google.stateMisMatch()) {
-        return response.redirect(`http://localhost:4200/oauth/google/callback/null?error=mismatch`)
+        return response.redirect(`${process.env.FRONT_URL}/oauth/google/callback/null?error=mismatch`)
       }
 
       if (google.hasError()) {
         return response.redirect(
-          `http://localhost:4200/oauth/google/callback/null?error=${google.getError()}`
+          `${process.env.FRONT_URL}/oauth/google/callback/null?error=${google.getError()}`
         )
       }
 
@@ -69,7 +69,7 @@ export default class AuthController {
       const userInDatabase = await User.findBy('email', googleUser.email)
       if (userInDatabase && userInDatabase.password) {
         return response.redirect(
-          `http://localhost:4200/oauth/google/callback/null?error=already_registered`
+          `${process.env.FRONT_URL}/oauth/google/callback/null?error=already_registered`
         )
       }
 
@@ -89,7 +89,7 @@ export default class AuthController {
       const token = await User.accessTokens.create(user)
 
       return response.redirect(
-        `http://localhost:4200/oauth/google/callback/${token.value?.release()}`
+        `${process.env.FRONT_URL}/oauth/google/callback/${token.value?.release()}`
       )
     } catch (error) {
       return response.internalServerError({
