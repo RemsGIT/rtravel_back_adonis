@@ -33,16 +33,28 @@ router
     router.post('/login', [AuthController, 'login'])
     router.post('/register', [AuthController, 'register'])
     router.post('/logout', [AuthController, 'logout'])
+
+    // Social OAuth
+    router.get('/google/redirect', ({ ally }) => {
+      return ally.use('google').redirect((redirectRequest) => {
+        redirectRequest.param('prompt', 'consent') // force auth
+      })
+    })
+    router.get('/google/callback', [AuthController, 'googleCallback'])
   })
   .prefix('auth')
 
 // Authenticated
 router
   .group(() => {
-    router.get('/auth/me', [AuthController, 'me'])
-    router.get('/auth/logout', [AuthController, 'logout'])
-    router.post('/auth/generate-otp', [AuthController, 'generateOTPCode'])
-    router.post('/auth/check-otp', [AuthController, 'checkOTPCode'])
+    router
+      .group(() => {
+        router.get('/me', [AuthController, 'me'])
+        router.get('/logout', [AuthController, 'logout'])
+        router.post('/generate-otp', [AuthController, 'generateOTPCode'])
+        router.post('/check-otp', [AuthController, 'checkOTPCode'])
+      })
+      .prefix('auth')
 
     /** region TRIPS **/
     router.get('/user/hastrips', [UsersController, 'hasTrips'])
@@ -103,8 +115,7 @@ router.post('/contact', async ({ request, response }: HttpContext) => {
     message
       .from('Rtravel Contact <noreply@rtravel.fr>')
       .to('contact@rcastro.fr')
-      .subject('Nouveau message sur Rtravel')
-      .html(`
+      .subject('Nouveau message sur Rtravel').html(`
         <h1>Nom : ${payload.name}</h1>
         <h4>Email : ${payload.email}</h4>
         <p>Contenu du message : <br/>${payload.body}</p>
