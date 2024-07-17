@@ -53,15 +53,20 @@ export default class TripsController {
 
   async show({ params, response }: HttpContext) {
     try {
-      const trip = await Trip.findOrFail(params.tripId)
-
-      await trip.load('user', (u) => {
-        u.select('id', 'username')
-      })
-      await trip.load('activities')
-      await trip.load('participants')
-      await trip.load('budget')
-      await trip.load('payments')
+      const trip = await Trip.query()
+        .where('id', params.tripId)
+        .preload('user', (builder) => {
+          builder.select(['id', 'username'])
+        })
+        .preload('activities')
+        .preload('budget')
+        .preload('payments', (builder) => {
+          builder
+            .preload('participant', (p) => p.select('id', 'name'))
+            .preload('user', (u) => u.select('id', 'username'))
+            .orderBy('createdAt', 'desc')
+        })
+        .firstOrFail()
 
       return response.ok(trip)
     } catch (error) {
