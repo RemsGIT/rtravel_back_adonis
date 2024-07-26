@@ -17,7 +17,9 @@ export default class CanViewTripMiddleware {
 
     // Check if user is the owner or in the participants
     const isOwner = trip.userId === user.id
-    const isParticipant = !!trip.participants.find((p) => p.email === user.email)
+    const isParticipant = !!trip.participants.find(
+      (p) => p.email?.toLowerCase() === user.email.toLowerCase()
+    )
 
     if (!isOwner && !isParticipant && user.role !== Roles.SUPERADMIN)
       return ctx.response.abort({ error: 'NOT_AUTHORIZED' }, 400)

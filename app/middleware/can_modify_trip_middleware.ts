@@ -18,7 +18,9 @@ export default class CanModifyTripMiddleware {
     // Check if user is the owner or participant with write permission
     const isOwner = trip.userId === user.id
     const isParticipantWithWritePermission = !!trip.participants.find(
-      (p) => p.email === user.email && p.policy === ParticipantPolicies.WRITE
+      (p) =>
+        p.email?.toLowerCase() === user.email.toLowerCase() &&
+        p.policy === ParticipantPolicies.WRITE
     )
 
     if (!isOwner && !isParticipantWithWritePermission)
